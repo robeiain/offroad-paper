@@ -4,14 +4,14 @@
 #
 # Takes a CSV file with the following values and converts it to pre-filled disclaimers & the sign on sheet.  
 # CSV format:
-# car_number, driver_surname, driver_firstname, navi_surname, navi_firstname, pit1_surname, pit1_firstname
+# car_number, surname, firstname, address, license_number, expiry_date
 # These are then saved to a PDF, one to a band, with car number -> firstname lastname 
 # Typeface is Helvetica, font size is 28 points.
 # uses https://py-pdf.github.io/fpdf2/ for generation.
 # 
 # to run:
 # env python3 competitor-disclaimer.py input.csv output.pdf type
-# where input.csv is formatted equivalent to the above; output.pdf is self explanatory; and type is the type of wristband (eg Driver, Navi, Pitcrew, etc)
+# where input.csv is formatted equivalent to the above; output.pdf is self explanatory; and type is the type of competitor (eg Driver, Navi, Pitcrew, etc)
 #
 from fpdf import FPDF
 import sys
@@ -30,7 +30,7 @@ disclaimer_heading = "RELEASE AND WAIVER OF LIABILITY"
 disclaimer_subheading = "ASSUMPTION OF RISK AND INDEMNITY AGREEMENT (Queensland)"
 disclaimer_warning = "\nWARNING!\tMOTOR RACING IS DANGEROUS\n\nAccidents can and do happen.  All care is taken to protect you, but you are warned that there is a possibility of an accident causing personal injury or death."
 disclaimer = """
-Subject to that warranty, if applicable and IN CONSIDERATION of being permitted to compete, officiate, observe, work for, or participate in any way in the EVENT(S) or being permitted to enter for any purpose any RESTRICTED AREA (defined as any area requiring special authorization, credentials, or permission to enter any area to which admission by the general public is restricted or prohibited), EACH OF THE UNDERSIGNED, for himself/herself, his/her personal representatives, heirs and next of kin.
+Subject to that warranty, if applicable and IN CONSIDERATION of being permitted to compete, officiate, observe, work for, or participate in any way in the EVENT(S) or being permitted to enter for any purpose any RESTRICTED AREA (defined as any area requiring special authorisation, credentials, or permission to enter any area to which admission by the general public is restricted or prohibited), EACH OF THE UNDERSIGNED, for himself/herself, his/her personal representatives, heirs and next of kin.
 1. Acknowledges, agrees and represents that he/she enters and he/she further agrees and warrants that, if at any time, he/she is in or about RESTRICTED AREAS and he/she feels anything to be unsafe, he/she will immediately advise the officials of such and will leave the RESTRICTED AREAS and/or refuse to participate further in the EVENT(S).
 2. HEREBY RELEASES, WAIVES, DISCHARGES AND COVENANTS NOT TO SUE Australian Auto-Sport Alliance Pty. Ltd., the Organisers, the landowners, promoters, participants, racing associations, sanctioning organisations or any subdivision thereof, track operators, officials, car owners, drivers, pit crews, rescue personnel, any persons in any RESTRICTED AREA, promoters, sponsors, advertisers, owners and lessees of premises used to conduct the EVENT(S), premises and Event inspectors, surveyors, underwriters, consultants and others who give recommendations, directions or instructions or engage in risk evaluation or loss control activities regarding the premises or EVENT(S) and each of them, their directors, officers, agents and employees, all for the purposes as herein referred to as "Releases", FROM ALL LIABILITY, TO THE UNDERSIGNED, his/her personal ON ACCOUNT OF INJURY TO THE PERSON OR RESULTING IN DEATH OF THE UNDERSIGNED ARISING OUT OR RELATED TO THE EVENT(S), WHETHER CAUSED BY THE NEGLIGENCE OF THE RELEASEES OR OTHERWISE.
 3. HEREBY ASSUMES FULL RESPONSIBILITY FOR ANY RISK OF PERSONAL INJURY or DEATH arising out of or related to the EVENT(S) whether caused by the NEGLIGENCE OF RELEASEES or otherwise.
@@ -48,40 +48,46 @@ Subject to that warranty, if applicable and IN CONSIDERATION of being permitted 
 3.3. the disease, substance or agent can cause or threaten bodily injury, illness, emotional distress, damage to human health, human welfare or property damage.
 """
 
-pdf.add_page()
-license_number = "1234"
-expiry_date = "23/03/2000"
-driver_firstname = "Iain"
-driver_surname = "Robertson"
-driver_address = "19 Martin Crescent Benarkin North QLD 4314"
-car_number = "9999"
+with open(sys.argv[1], newline='') as csvfile:
+    field_names = ["carnumber", "surname", "firstname"]
+    entries = csv.DictReader(csvfile, fieldnames=field_names)
+    for row in entries:
+        pdf.add_page()
+        license_number = "1234"
+        expiry_date = "23/03/2000"
+        firstname = row["firstname"]
+        surname = row["surname"]
+        address = "19 Martin Crescent Benarkin North QLD 4314"
+        car_number = row["carnumber"]
 
-pdf.set_font("helvetica", size=8, style="B")
-pdf.cell(w=277, text="DRIVER " + car_number, align="C", new_x="LMARGIN", new_y="NEXT")
-pdf.image("./AORRA.png", y=5, w=71, h=32)
-pdf.image("./AASA.png", x=202, y=5, w=85, h=32)
-pdf.cell(w=277, h=22, new_x="LMARGIN", new_y="NEXT")
-pdf.set_font("helvetica", size=12, style="B")
-pdf.multi_cell(w=277, text=disclaimer_heading, align="C", new_x="LMARGIN", new_y="NEXT")
-pdf.set_font("helvetica", size=10, style="B")
-pdf.cell(w=277, h=3, align="C", new_x="LMARGIN", new_y="NEXT")
-pdf.multi_cell(w=277, text=disclaimer_subheading, align="C", new_x="LMARGIN", new_y="NEXT")
-pdf.set_font("helvetica", size=10, style="B")
-pdf.cell(w=277, h=3, align="C", new_x="LMARGIN", new_y="NEXT")
-pdf.multi_cell(w=277, text=disclaimer_warning, align="C", new_x="LMARGIN", new_y="NEXT")
-pdf.set_font("helvetica", size=6, style="")
-pdf.cell(w=277, h=3, align="C", new_x="LMARGIN", new_y="NEXT")
-pdf.multi_cell(w=277, text=disclaimer, align="L", new_x="LMARGIN", new_y="NEXT", markdown=True)
-pdf.cell(w=277, h=10, align="C", new_x="LMARGIN", new_y="NEXT")
+        pdf.set_font("helvetica", size=8, style="B")
+        pdf.cell(w=277, text=sys.argv[3].upper() + " " + car_number + " " + surname.upper(), align="C", new_x="LMARGIN", new_y="NEXT")
+        pdf.image("./AORRA.png", y=5, w=71, h=32)
+        pdf.image("./AASA.png", x=202, y=5, w=85, h=32)
+        pdf.cell(w=277, h=22, new_x="LMARGIN", new_y="NEXT")
+        pdf.set_font("helvetica", size=12, style="B")
+        pdf.multi_cell(w=277, text=disclaimer_heading, align="C", new_x="LMARGIN", new_y="NEXT")
+        pdf.set_font("helvetica", size=10, style="B")
+        pdf.cell(w=277, h=3, align="C", new_x="LMARGIN", new_y="NEXT")
+        pdf.multi_cell(w=277, text=disclaimer_subheading, align="C", new_x="LMARGIN", new_y="NEXT")
+        pdf.set_font("helvetica", size=10, style="B")
+        pdf.cell(w=277, h=3, align="C", new_x="LMARGIN", new_y="NEXT")
+        pdf.multi_cell(w=277, text=disclaimer_warning, align="C", new_x="LMARGIN", new_y="NEXT")
+        pdf.set_font("helvetica", size=6, style="")
+        pdf.cell(w=277, h=3, align="C", new_x="LMARGIN", new_y="NEXT")
+        pdf.multi_cell(w=277, text=disclaimer, align="L", new_x="LMARGIN", new_y="NEXT", markdown=True)
+        pdf.cell(w=277, h=10, align="C", new_x="LMARGIN", new_y="NEXT")
 
-pdf.set_font("helvetica", size=12, style="")
-driver_disclaimer = "License Number:\t**" + license_number + "** License Expiry Date: **" + expiry_date + "**\n\nI, **" + driver_firstname + " " + driver_surname + "** of address **" + driver_address + "**\nhave read this Release and Waiver of Liability, assumption of risk and Indemnity Agreement, fully understand its terms, understand that I have given up substantial rights by signing it, and hve signed it freely and voluntarily without any inducement, assurance or guarantee made to me and intend my signature to be a complete and unconditional release of all liability to the greatest extent allowed by law."
-pdf.multi_cell(w=277, h=6, text=driver_disclaimer, align="L", new_x="LMARGIN", new_y="NEXT", markdown=True)
-pdf.cell(w=277, h=10, new_x="LMARGIN", new_y="NEXT")
-pdf.cell(w=139, text="___________________________________________")
-pdf.cell(w=138, text="___________________________________________", new_x="LMARGIN", new_y="NEXT")
-pdf.cell(w=139, text="(Signature)")
-pdf.cell(w=138, text="(Date)", new_x="LMARGIN", new_y="NEXT")
+        pdf.set_font("helvetica", size=12, style="")
+        driver_disclaimer = "License Number:\t**" + license_number + "** License Expiry Date: **" + expiry_date + "**\n\nI, **" + firstname + " " + surname + "** of address **" + address + "**\nhave read this Release and Waiver of Liability, assumption of risk and Indemnity Agreement, fully understand its terms, understand that I have given up substantial rights by signing it, and hve signed it freely and voluntarily without any inducement, assurance or guarantee made to me and intend my signature to be a complete and unconditional release of all liability to the greatest extent allowed by law."
+        pdf.multi_cell(w=277, h=6, text=driver_disclaimer, align="L", new_x="LMARGIN", new_y="NEXT", markdown=True)
+        pdf.cell(w=277, h=10, new_x="LMARGIN", new_y="NEXT")
+        pdf.cell(w=139, h=12, text="___________________________________________")
+        pdf.cell(w=138, h=12, text="___________________________________________", new_x="LMARGIN", new_y="NEXT")
+        pdf.cell(w=139, text="(Signature)")
+        pdf.cell(w=138, text="(Date)", new_x="LMARGIN", new_y="NEXT")
+
+
 pdf.output(sys.argv[2])
 
 
