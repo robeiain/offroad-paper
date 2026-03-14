@@ -17,19 +17,19 @@ from fpdf import FPDF
 import sys
 import csv 
 
-if len(sys.argv) != 4:
-    sys.stderr.write("Error: incorrect usage\n")
-    sys.stderr.write("Usage: " + sys.argv[0] + " input.csv output.pdf type")
-    exit(1)
+def competitor_disclaimer(csv_file, output_file, disclaimer_type, disclaimer_heading ="", disclaimer_subheading = "", disclaimer_warning = "", disclaimer = ""):
+    pdf = FPDF(orientation="landscape", format="A4")
+    pdf.set_margin(10)
+    pdf.set_font("helvetica", size=12)
 
-pdf = FPDF(orientation="landscape", format="A4")
-pdf.set_margin(10)
-pdf.set_font("helvetica", size=12)
-
-disclaimer_heading = "RELEASE AND WAIVER OF LIABILITY"
-disclaimer_subheading = "ASSUMPTION OF RISK AND INDEMNITY AGREEMENT (Queensland)"
-disclaimer_warning = "\nWARNING!  \t  MOTOR RACING IS DANGEROUS\n\nAccidents can and do happen.\nAll care is taken to protect you, but you are warned that there is a possibility of an accident causing personal injury or death."
-disclaimer = """
+    if disclaimer_heading == "":
+        disclaimer_heading = "RELEASE AND WAIVER OF LIABILITY"
+    if disclaimer_subheading == "":
+        disclaimer_subheading = "ASSUMPTION OF RISK AND INDEMNITY AGREEMENT (Queensland)"
+    if disclaimer_warning == "":
+        disclaimer_warning = "\nWARNING!  \t  MOTOR RACING IS DANGEROUS\n\nAccidents can and do happen.\nAll care is taken to protect you, but you are warned that there is a possibility of an accident causing personal injury or death."
+    if disclaimer == "":
+        disclaimer = """
 Subject to that warranty, if applicable and IN CONSIDERATION of being permitted to compete, officiate, observe, work for, or participate in any way in the EVENT(S) or being permitted to enter for any purpose any RESTRICTED AREA (defined as any area requiring special authorisation, credentials, or permission to enter any area to which admission by the general public is restricted or prohibited), EACH OF THE UNDERSIGNED, for himself/herself, his/her personal representatives, heirs and next of kin.
 1. Acknowledges, agrees and represents that he/she enters and he/she further agrees and warrants that, if at any time, he/she is in or about RESTRICTED AREAS and he/she feels anything to be unsafe, he/she will immediately advise the officials of such and will leave the RESTRICTED AREAS and/or refuse to participate further in the EVENT(S).
 2. HEREBY RELEASES, WAIVES, DISCHARGES AND COVENANTS NOT TO SUE Australian Auto-Sport Alliance Pty. Ltd., the Organisers, the landowners, promoters, participants, racing associations, sanctioning organisations or any subdivision thereof, track operators, officials, car owners, drivers, pit crews, rescue personnel, any persons in any RESTRICTED AREA, promoters, sponsors, advertisers, owners and lessees of premises used to conduct the EVENT(S), premises and Event inspectors, surveyors, underwriters, consultants and others who give recommendations, directions or instructions or engage in risk evaluation or loss control activities regarding the premises or EVENT(S) and each of them, their directors, officers, agents and employees, all for the purposes as herein referred to as "Releases", FROM ALL LIABILITY, TO THE UNDERSIGNED, his/her personal ON ACCOUNT OF INJURY TO THE PERSON OR RESULTING IN DEATH OF THE UNDERSIGNED ARISING OUT OR RELATED TO THE EVENT(S), WHETHER CAUSED BY THE NEGLIGENCE OF THE RELEASEES OR OTHERWISE.
@@ -48,48 +48,55 @@ Subject to that warranty, if applicable and IN CONSIDERATION of being permitted 
 3.3. the disease, substance or agent can cause or threaten bodily injury, illness, emotional distress, damage to human health, human welfare or property damage.
 """
 
-with open(sys.argv[1], newline='') as csvfile:
-    # car_number, surname, firstname, address, license_number, expiry_date
-    field_names = ["carnumber", "surname", "firstname", "address", "license", "expiry"]
-    entries = csv.DictReader(csvfile, fieldnames=field_names)
-    for row in entries:
-        pdf.add_page()
-        license_number = row["license"]
-        expiry_date = row["expiry"]
-        firstname = row["firstname"]
-        surname = row["surname"]
-        address = row["address"]
-        car_number = row["carnumber"]
+    with open(csv_file, newline='') as csvfile:
+        # car_number, surname, firstname, address, license_number, expiry_date
+        field_names = ["carnumber", "surname", "firstname", "address", "license", "expiry"]
+        entries = csv.DictReader(csvfile, fieldnames=field_names)
+        for row in entries:
+            pdf.add_page()
+            license_number = row["license"]
+            expiry_date = row["expiry"]
+            firstname = row["firstname"]
+            surname = row["surname"]
+            address = row["address"]
+            car_number = row["carnumber"]
 
-        pdf.set_font("helvetica", size=8, style="B")
-        pdf.cell(w=277, text=sys.argv[3].upper() + " " + car_number + " " + surname.upper(), align="C", new_x="LMARGIN", new_y="NEXT")
-        pdf.image("./AORRA.png", y=5, w=71, h=32)
-        pdf.image("./AASA.png", x=202, y=5, w=85, h=32)
-        pdf.cell(w=277, h=22, new_x="LMARGIN", new_y="NEXT")
-        pdf.set_font("helvetica", size=12, style="B")
-        pdf.multi_cell(w=277, text=disclaimer_heading, align="C", new_x="LMARGIN", new_y="NEXT")
-        pdf.set_font("helvetica", size=10, style="B")
-        pdf.cell(w=277, h=3, align="C", new_x="LMARGIN", new_y="NEXT")
-        pdf.multi_cell(w=277, text=disclaimer_subheading, align="C", new_x="LMARGIN", new_y="NEXT")
-        pdf.set_font("helvetica", size=10, style="B")
-        pdf.cell(w=277, h=3, align="C", new_x="LMARGIN", new_y="NEXT")
-        pdf.multi_cell(w=277, text=disclaimer_warning, align="C", new_x="LMARGIN", new_y="NEXT")
-        pdf.set_font("helvetica", size=6, style="")
-        pdf.cell(w=277, h=3, align="C", new_x="LMARGIN", new_y="NEXT")
-        pdf.multi_cell(w=277, text=disclaimer, align="L", new_x="LMARGIN", new_y="NEXT", markdown=True)
-        pdf.cell(w=277, h=10, align="C", new_x="LMARGIN", new_y="NEXT")
+            pdf.set_font("helvetica", size=8, style="B")
+            pdf.cell(w=277, text=disclaimer_type + " " + car_number + " " + surname.upper(), align="C", new_x="LMARGIN", new_y="NEXT")
+            pdf.image("./AORRA.png", y=5, w=71, h=32)
+            pdf.image("./AASA.png", x=202, y=5, w=85, h=32)
+            pdf.cell(w=277, h=22, new_x="LMARGIN", new_y="NEXT")
+            pdf.set_font("helvetica", size=12, style="B")
+            pdf.multi_cell(w=277, text=disclaimer_heading, align="C", new_x="LMARGIN", new_y="NEXT")
+            pdf.set_font("helvetica", size=10, style="B")
+            pdf.cell(w=277, h=3, align="C", new_x="LMARGIN", new_y="NEXT")
+            pdf.multi_cell(w=277, text=disclaimer_subheading, align="C", new_x="LMARGIN", new_y="NEXT")
+            pdf.set_font("helvetica", size=10, style="B")
+            pdf.cell(w=277, h=3, align="C", new_x="LMARGIN", new_y="NEXT")
+            pdf.multi_cell(w=277, text=disclaimer_warning, align="C", new_x="LMARGIN", new_y="NEXT")
+            pdf.set_font("helvetica", size=6, style="")
+            pdf.cell(w=277, h=3, align="C", new_x="LMARGIN", new_y="NEXT")
+            pdf.multi_cell(w=277, text=disclaimer, align="L", new_x="LMARGIN", new_y="NEXT", markdown=True)
+            pdf.cell(w=277, h=10, align="C", new_x="LMARGIN", new_y="NEXT")
 
-        pdf.set_font("helvetica", size=12, style="")
-        driver_disclaimer = "License Number:\t**" + license_number + "** License Expiry Date: **" + expiry_date + "**\n\nI, **" + firstname + " " + surname + "** of address **" + address + "**\nhave read this Release and Waiver of Liability, assumption of risk and Indemnity Agreement, fully understand its terms, understand that I have given up substantial rights by signing it, and hve signed it freely and voluntarily without any inducement, assurance or guarantee made to me and intend my signature to be a complete and unconditional release of all liability to the greatest extent allowed by law."
-        pdf.multi_cell(w=277, h=6, text=driver_disclaimer, align="L", new_x="LMARGIN", new_y="NEXT", markdown=True)
-        pdf.cell(w=277, h=10, new_x="LMARGIN", new_y="NEXT")
-        pdf.cell(w=139, h=12, text="___________________________________________")
-        pdf.cell(w=138, h=12, text="___________________________________________", new_x="LMARGIN", new_y="NEXT")
-        pdf.cell(w=139, text="(Signature)")
-        pdf.cell(w=138, text="(Date)", new_x="LMARGIN", new_y="NEXT")
+            pdf.set_font("helvetica", size=12, style="")
+            driver_disclaimer = "License Number:\t**" + license_number + "** License Expiry Date: **" + expiry_date + "**\n\nI, **" + firstname + " " + surname + "** of address **" + address + "**\nhave read this Release and Waiver of Liability, assumption of risk and Indemnity Agreement, fully understand its terms, understand that I have given up substantial rights by signing it, and hve signed it freely and voluntarily without any inducement, assurance or guarantee made to me and intend my signature to be a complete and unconditional release of all liability to the greatest extent allowed by law."
+            pdf.multi_cell(w=277, h=6, text=driver_disclaimer, align="L", new_x="LMARGIN", new_y="NEXT", markdown=True)
+            pdf.cell(w=277, h=10, new_x="LMARGIN", new_y="NEXT")
+            pdf.cell(w=139, h=12, text="___________________________________________")
+            pdf.cell(w=138, h=12, text="___________________________________________", new_x="LMARGIN", new_y="NEXT")
+            pdf.cell(w=139, text="(Signature)")
+            pdf.cell(w=138, text="(Date)", new_x="LMARGIN", new_y="NEXT")
 
+    pdf.output(output_file)
+    return(0)
 
-pdf.output(sys.argv[2])
+if __name__ == "__main__":
+    if len(sys.argv) != 4:
+        sys.stderr.write("Error: incorrect usage\n")
+        sys.stderr.write("Usage: " + sys.argv[0] + " input.csv output.pdf type")
+        exit(1)
 
+    competitor_disclaimer(sys.argv[1], sys.argv[2], sys.argv[3].upper())
 
-exit(0)
+    exit(0)
