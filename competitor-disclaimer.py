@@ -28,7 +28,7 @@ pdf.set_font("helvetica", size=12)
 
 disclaimer_heading = "RELEASE AND WAIVER OF LIABILITY"
 disclaimer_subheading = "ASSUMPTION OF RISK AND INDEMNITY AGREEMENT (Queensland)"
-disclaimer_warning = "\nWARNING!\tMOTOR RACING IS DANGEROUS\n\nAccidents can and do happen.  All care is taken to protect you, but you are warned that there is a possibility of an accident causing personal injury or death."
+disclaimer_warning = "\nWARNING!  \t  MOTOR RACING IS DANGEROUS\n\nAccidents can and do happen.\nAll care is taken to protect you, but you are warned that there is a possibility of an accident causing personal injury or death."
 disclaimer = """
 Subject to that warranty, if applicable and IN CONSIDERATION of being permitted to compete, officiate, observe, work for, or participate in any way in the EVENT(S) or being permitted to enter for any purpose any RESTRICTED AREA (defined as any area requiring special authorisation, credentials, or permission to enter any area to which admission by the general public is restricted or prohibited), EACH OF THE UNDERSIGNED, for himself/herself, his/her personal representatives, heirs and next of kin.
 1. Acknowledges, agrees and represents that he/she enters and he/she further agrees and warrants that, if at any time, he/she is in or about RESTRICTED AREAS and he/she feels anything to be unsafe, he/she will immediately advise the officials of such and will leave the RESTRICTED AREAS and/or refuse to participate further in the EVENT(S).
@@ -49,15 +49,16 @@ Subject to that warranty, if applicable and IN CONSIDERATION of being permitted 
 """
 
 with open(sys.argv[1], newline='') as csvfile:
-    field_names = ["carnumber", "surname", "firstname"]
+    # car_number, surname, firstname, address, license_number, expiry_date
+    field_names = ["carnumber", "surname", "firstname", "address", "license", "expiry"]
     entries = csv.DictReader(csvfile, fieldnames=field_names)
     for row in entries:
         pdf.add_page()
-        license_number = "1234"
-        expiry_date = "23/03/2000"
+        license_number = row["license"]
+        expiry_date = row["expiry"]
         firstname = row["firstname"]
         surname = row["surname"]
-        address = "19 Martin Crescent Benarkin North QLD 4314"
+        address = row["address"]
         car_number = row["carnumber"]
 
         pdf.set_font("helvetica", size=8, style="B")
