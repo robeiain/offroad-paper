@@ -10,6 +10,8 @@
 # 
 # to run:
 # env python3 wristbands.py input.csv output.pdf type
+# where input.csv is formatted equivalent to the above; output.pdf is self explanatory; and type is the type of wristband (eg Driver, Navi, Pitcrew, etc)
+#
 from fpdf import FPDF
 import sys
 import csv 
@@ -29,7 +31,7 @@ with open(sys.argv[1], newline='') as csvfile:
     for row in entries:
         pdf.set_font("helvetica", size=26, style="B")
         line = row["carnumber"] + "\t" + row["firstname"] + " " + row["surname"]
-        pdf.cell(w=297, h=15, text=line.upper(), align="C", new_x="LEFT", new_y="NEXT")
+        pdf.cell(w=297, h=15, text=line.upper(), align="C", new_x="LEFT", new_y="NEXT", )
         pdf.set_font("helvetica", size=12, style="B")
         pdf.cell(w=297, h=6, text=sys.argv[3].upper(), align="C", new_x="LEFT", new_y="NEXT")
 
