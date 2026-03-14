@@ -6,6 +6,7 @@
 # car_number, surname, firstname
 # These are then saved to a PDF, one to a band, with car number -> firstname lastname 
 # Typeface is Helvetica, font size is 28 points.
+# Laserbands are 250mm long and 20.5mm wide (10 to a sheet)
 # uses https://py-pdf.github.io/fpdf2/ for generation.
 # 
 # to run:
@@ -21,7 +22,7 @@ if len(sys.argv) != 4:
     sys.stderr.write("Usage: " + sys.argv[0] + " input.csv output.pdf type")
     exit(1)
 
-pdf = FPDF(orientation="landscape", format="A4")
+pdf = FPDF(format=(250, 205))
 pdf.set_margin(0)
 pdf.add_page()
 
@@ -29,11 +30,13 @@ with open(sys.argv[1], newline='') as csvfile:
     field_names = ["carnumber", "surname", "firstname"]
     entries = csv.DictReader(csvfile, fieldnames=field_names)
     for row in entries:
+        height = 20.5
         pdf.set_font("helvetica", size=26, style="B")
         line = row["carnumber"] + "\t" + row["firstname"] + " " + row["surname"]
-        pdf.cell(w=297, h=15, text=line.upper(), align="C", new_x="LEFT", new_y="NEXT", )
+        pdf.cell(w=200, h=height, text=line.upper(), align="C")
         pdf.set_font("helvetica", size=12, style="B")
-        pdf.cell(w=297, h=6, text=sys.argv[3].upper(), align="C", new_x="LEFT", new_y="NEXT")
+        pdf.cell(w=50, h=height, text=sys.argv[3].upper(), align="C", new_x="LMARGIN", new_y="NEXT")
+
 
 pdf.output(sys.argv[2])
 
