@@ -17,7 +17,7 @@ from fpdf import FPDF
 import sys
 import csv 
 
-def competitor_disclaimer(csv_file, output_file, disclaimer_type, disclaimer_heading ="", disclaimer_subheading = "", disclaimer_warning = "", disclaimer = ""):
+def competitordisclaimer(csv_file, output_file, disclaimer_type, disclaimer_heading ="", disclaimer_subheading = "", disclaimer_warning = "", disclaimer = ""):
     pdf = FPDF(orientation="landscape", format="A4")
     pdf.set_margin(10)
     pdf.set_font("helvetica", size=12)
@@ -97,6 +97,6 @@ if __name__ == "__main__":
         sys.stderr.write("Usage: " + sys.argv[0] + " input.csv output.pdf type")
         exit(1)
 
-    competitor_disclaimer(sys.argv[1], sys.argv[2], sys.argv[3].upper())
+    competitordisclaimer(sys.argv[1], sys.argv[2], sys.argv[3].upper())
 
     exit(0)
