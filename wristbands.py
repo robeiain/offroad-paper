@@ -17,28 +17,32 @@ from fpdf import FPDF
 import sys
 import csv 
 
-if len(sys.argv) != 4:
-    sys.stderr.write("Error: incorrect usage\n")
-    sys.stderr.write("Usage: " + sys.argv[0] + " input.csv output.pdf type")
-    exit(1)
+def wristbands(csv_file, output_file, wristband_type):
+    pdf = FPDF(format=(250, 205))
+    pdf.set_margin(0)
+    pdf.add_page()
 
-pdf = FPDF(format=(250, 205))
-pdf.set_margin(0)
-pdf.add_page()
+    with open(csv_file, newline='') as csvfile:
+        field_names = ["carnumber", "surname", "firstname"]
+        entries = csv.DictReader(csvfile, fieldnames=field_names)
+        for row in entries:
+            height = 20.5 #width of each wristband (20.5 x 250)
+            pdf.set_font("helvetica", size=26, style="B")
+            line = row["firstname"] + " " + row["surname"]
+            pdf.cell(w=50, h=height, text=row["carnumber"], align="C")
+            pdf.cell(w=150, h=height, text=line.upper(), align="C")
+            pdf.set_font("helvetica", size=12, style="B")
+            pdf.cell(w=50, h=height, text=wristband_type, align="L", new_x="LMARGIN", new_y="NEXT")
 
-with open(sys.argv[1], newline='') as csvfile:
-    field_names = ["carnumber", "surname", "firstname"]
-    entries = csv.DictReader(csvfile, fieldnames=field_names)
-    for row in entries:
-        height = 20.5
-        pdf.set_font("helvetica", size=26, style="B")
-        line = row["carnumber"] + "\t" + row["firstname"] + " " + row["surname"]
-        pdf.cell(w=200, h=height, text=line.upper(), align="C")
-        pdf.set_font("helvetica", size=12, style="B")
-        pdf.cell(w=50, h=height, text=sys.argv[3].upper(), align="C", new_x="LMARGIN", new_y="NEXT")
+    pdf.output(output_file)
+    return(0)
 
+if __name__ == "__main__":
+    if len(sys.argv) != 4:
+        sys.stderr.write("Error: incorrect usage\n")
+        sys.stderr.write("Usage: " + sys.argv[0] + " input.csv output.pdf type")
+        exit(1)
 
-pdf.output(sys.argv[2])
-
+    wristbands(sys.argv[1], sys.argv[2], sys.argv[3].upper())
 
 exit(0)
