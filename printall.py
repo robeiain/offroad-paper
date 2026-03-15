@@ -20,7 +20,6 @@ from wristbands import wristbands
 from competitordisclaimer import competitordisclaimer
 
 if __name__ == "__main__":
-
     if len(sys.argv) != 3:
         sys.stderr.write("Error: incorrect usage\n")
         sys.stderr.write("Usage: " + sys.argv[0] + " input.csv type")
@@ -30,5 +29,5 @@ if __name__ == "__main__":
     competitordisclaimer(sys.argv[1], sys.argv[2] + "disclaimers.pdf", sys.argv[2].upper())
     exit(0)
 else:
-    raise ImportError("Why are we here?")
+    raise ImportError("This file is not designed to be imported.")
 
