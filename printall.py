@@ -12,26 +12,22 @@
 # uses https://py-pdf.github.io/fpdf2/ for generation.
 #
 # to run:
-# env python3 print-all.py input.csv type
+# env python3 printall.py input.csv type
 # where input.csv is formatted equivalent to the above and type is the type of wristband (eg Driver, Navi, Pitcrew, etc)
 #
 import sys
-import wristbands
-import competitordisclaimer
-
+from wristbands import wristbands
+from competitordisclaimer import competitordisclaimer
 
 if __name__ == "__main__":
-    sys.stdout.write("Test1")
 
     if len(sys.argv) != 3:
         sys.stderr.write("Error: incorrect usage\n")
         sys.stderr.write("Usage: " + sys.argv[0] + " input.csv type")
         exit(1)
-    
-    sys.stdout.write("Test2")
 
-    wristbands.wristbands(sys.argv[1], sys.argv[2] +"wristbands.pdf", sys.argv[2].upper())
-    competitordisclaimer.competitordisclaimer(sys.argv[1], sys.argv[2] + "disclaimers.pdf", sys.argv[2].upper())
+    wristbands(sys.argv[1], sys.argv[2] + "wristbands.pdf", sys.argv[2].upper())
+    competitordisclaimer(sys.argv[1], sys.argv[2] + "disclaimers.pdf", sys.argv[2].upper())
     exit(0)
 else:
     raise ImportError("Why are we here?")

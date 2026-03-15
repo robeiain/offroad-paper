@@ -45,4 +45,4 @@ if __name__ == "__main__":
 
     wristbands(sys.argv[1], sys.argv[2], sys.argv[3].upper())
 
-exit(0)
+    exit(0)
